@@ -25,8 +25,7 @@ jobs:
     - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
     - run: Set-LocalUser -Name "admin" -Password (ConvertTo-SecureString -AsPlainText "admin" -Force)
     - name: Enable Windows Audio Service
-      run: |
-        Set-Service -Name Audiosrv -StartupType Automatic
-        Start-Service -Name Audiosrv
+      run: Set-Service -Name Audiosrv -StartupType Automatic
+    - run: Start-Service -Name Audiosrv
     - name: Create Tunnel
       run: .\ngrok\ngrok.exe tcp 3389
