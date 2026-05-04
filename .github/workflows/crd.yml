@@ -1,4 +1,4 @@
-name: CRD Windows Full Setup
+name: CRD Windows
 
 on: [workflow_dispatch]
 
@@ -7,36 +7,22 @@ jobs:
     runs-on: windows-latest
 
     steps:
-
-    # 🕒 Optional timezone
     - name: Set timezone
       run: tzutil /s "India Standard Time"
 
-    # 📦 Install Chrome Remote Desktop
     - name: Install CRD
       run: |
         Invoke-WebRequest https://dl.google.com/edgedl/chrome-remote-desktop/chromeremotedesktophost.msi -OutFile crd.msi
         Start-Process msiexec.exe -ArgumentList '/i crd.msi /quiet /norestart' -Wait
 
-    # 🔐 Set Windows user password
     - name: Set password
       run: net user runneradmin admin@123
 
-    # 🖥️ FIX DISPLAY (Resolution + DPI)
-    - name: Fix display (DPI + Resolution)
+    - name: Fix display
       run: |
-        # Fix DPI scaling (no blur)
         Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "LogPixels" -Value 96
         Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "Win8DpiScaling" -Value 1
 
-        # Download QRes (reliable resolution tool)
-        Invoke-WebRequest https://sourceforge.net/projects/qres/files/latest/download -OutFile QRes.zip
-        Expand-Archive QRes.zip
-
-        # Set resolution to 1920x1080
-        .\QRes.exe /x:1920 /y:1080
-
-    # 🚀 Start Chrome Remote Desktop
     - name: Start CRD
       run: |
         & "${Env:PROGRAMFILES(X86)}\Google\Chrome Remote Desktop\CurrentVersion\remoting_start_host.exe" `
@@ -47,6 +33,5 @@ jobs:
       env:
         CRD_CODE: ${{ secrets.CRD_CODE }}
 
-    # 🔁 Keep machine alive (6 hours max)
     - name: Keep Alive
       run: Start-Sleep -Seconds 21600
